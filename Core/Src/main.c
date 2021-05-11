@@ -22,7 +22,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <string.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -36,7 +36,7 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+#define WELCOME "hello, world! 来自温湿度传感系统 :)\n"
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -96,6 +96,12 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+      static GPIO_PinState state = GPIO_PIN_SET;
+      state ^= 1;
+      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, state);
+      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, state);
+      while (HAL_UART_Transmit(&huart3, (uint8_t *)WELCOME, strlen(WELCOME), 0xFFFF)!=HAL_OK);
+      HAL_Delay(200);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
