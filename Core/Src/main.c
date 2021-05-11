@@ -23,6 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <string.h>
+#include "vlist.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -96,6 +97,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+      vlist list = make_vlist(5);
+      if (list == NULL) continue;
       static GPIO_PinState state = GPIO_PIN_SET;
       state ^= 1;
       HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, state);
