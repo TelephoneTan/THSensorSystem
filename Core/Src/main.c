@@ -23,7 +23,11 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <string.h>
+#include <stdio.h>
+#include <stdarg.h>
 #include "vlist.h"
+#include "vutils.h"
+#include "logme.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -57,7 +61,14 @@ static void MX_USART3_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+void logme_vprintf(const char* restrict format, va_list vlist){
+    char buf[2048] = {0};
+    vsnprintf(buf, sizeof(buf), format, vlist);
+    while (HAL_UART_Transmit(&huart3, (uint8_t *)buf, strlen(buf), 0xFFFFFFFF)!=HAL_OK);
+}
+long long logme_get_time(){
+    return HAL_GetTick();
+}
 /* USER CODE END 0 */
 
 /**
@@ -98,13 +109,15 @@ int main(void)
   while (1)
   {
       vlist list = make_vlist(5);
-      if (list == NULL) continue;
+      char *rabbit = zero_malloc(5);
+      if (rabbit == NULL) continue;
       static GPIO_PinState state = GPIO_PIN_SET;
       state ^= 1;
       HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, state);
       HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, state);
-      while (HAL_UART_Transmit(&huart3, (uint8_t *)WELCOME, strlen(WELCOME), 0xFFFF)!=HAL_OK);
-      HAL_Delay(200);
+      LogMe.b("%s", WELCOME);
+      LogMe.bt("%s", WELCOME);
+      HAL_Delay(100);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
