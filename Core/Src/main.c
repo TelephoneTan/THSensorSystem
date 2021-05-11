@@ -41,7 +41,7 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-#define WELCOME "hello, world! 来自温湿度传感系统 :)\n"
+#define WELCOME "hello, world! From THSensorSystem :)"
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
