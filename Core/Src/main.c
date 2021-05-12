@@ -69,6 +69,9 @@ void logme_vprintf(const char* restrict format, va_list vlist){
 long long logme_get_time(){
     return HAL_GetTick();
 }
+int logme_prepare(){
+    return 1;
+}
 /* USER CODE END 0 */
 
 /**
@@ -103,6 +106,11 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
+
+  /* Software Initialization */
+  /* USER CODE BEGIN */
+  logme_init();
+  /* USER CODE END */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
