@@ -340,6 +340,9 @@ void setup(){
     // SerialLog is used to send log to PC via CP2102
     SerialLog.begin(115200);
 
+    // set pin: TX(D8), RX(D7)
+    SerialData.swap();
+
     // disable software watchdog
     ESP.wdtDisable();
 
@@ -350,7 +353,16 @@ void setup(){
     ensure_network();
 }
 
+unsigned char next(){
+    while(!SerialData.available()){
+        // feed hardware WDT
+        ESP.wdtFeed();
+    }
+    return SerialData.read();
+}
+
 void loop(){
     // feed hardware WDT
     ESP.wdtFeed();
+    SerialLog.write(next());
 }
