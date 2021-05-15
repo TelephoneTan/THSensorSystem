@@ -58,6 +58,38 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define LCD1602D7_Pin GPIO_PIN_2
+#define LCD1602D7_GPIO_Port GPIOC
+#define DHT11_data_Pin GPIO_PIN_1
+#define DHT11_data_GPIO_Port GPIOA
+#define LCD1602RS_Pin GPIO_PIN_2
+#define LCD1602RS_GPIO_Port GPIOA
+#define LCD1602RW_Pin GPIO_PIN_3
+#define LCD1602RW_GPIO_Port GPIOA
+#define LCD1602E_Pin GPIO_PIN_4
+#define LCD1602E_GPIO_Port GPIOA
+#define LCD1602D0_Pin GPIO_PIN_5
+#define LCD1602D0_GPIO_Port GPIOA
+#define LCD1602D1_Pin GPIO_PIN_6
+#define LCD1602D1_GPIO_Port GPIOA
+#define LCD1602D2_Pin GPIO_PIN_7
+#define LCD1602D2_GPIO_Port GPIOA
+#define LCD1602D3_Pin GPIO_PIN_4
+#define LCD1602D3_GPIO_Port GPIOC
+#define LCD1602D4_Pin GPIO_PIN_5
+#define LCD1602D4_GPIO_Port GPIOC
+#define LCD1602D5_Pin GPIO_PIN_0
+#define LCD1602D5_GPIO_Port GPIOB
+#define LCD1602D6_Pin GPIO_PIN_1
+#define LCD1602D6_GPIO_Port GPIOB
+#define LEDDHT___Pin GPIO_PIN_11
+#define LEDDHT___GPIO_Port GPIOA
+#define VOICE___Pin GPIO_PIN_3
+#define VOICE___GPIO_Port GPIOB
+#define VOICE_G_Pin GPIO_PIN_4
+#define VOICE_G_GPIO_Port GPIOB
+#define DHT11_power_Pin GPIO_PIN_9
+#define DHT11_power_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
