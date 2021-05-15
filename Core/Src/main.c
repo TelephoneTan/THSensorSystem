@@ -35,6 +35,7 @@
 /** ################################## ppy ################################## */
 /** ################################## sjj ################################## */
 /** ################################## tyj ################################## */
+#include "LCD1602.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -78,6 +79,8 @@ UART_HandleTypeDef huart3;
 /** ################################## ppy ################################## */
 /** ################################## sjj ################################## */
 /** ################################## tyj ################################## */
+int WorC=0;             //0 means work,1 cry
+int deverse=0;			//deverce lcd
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -364,6 +367,67 @@ void DHT_enable_interrupt(){
 /** ################################## ppy ################################## */
 /** ################################## sjj ################################## */
 /** ################################## tyj ################################## */
+/*
+ * Init lcd
+ * Make voice_module work
+ */
+void initmodule(){
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
+    lcd_init();
+    lcd_clear();
+    lcd_put_cur(0, 0);
+    lcd_send_string(" DEV ");
+    lcd_send_string("IS ");
+    lcd_send_string("WORKING");
+
+    lcd_put_cur(1, 0);
+    lcd_send_string("FROM T&J PRODUCE");
+}
+void cry(){
+    lcd_clear();
+    lcd_put_cur(0, 0);
+    lcd_send_string(" BABY ");
+    lcd_send_string("IS ");
+    lcd_send_string("CRYING");
+
+//	lcd_put_cur(1, 0);
+//	lcd_send_string("FROM T&J PRODUCE");
+//	for(int i=0;i<4;i++){
+//		HAL_Delay(500);
+//		while(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_5)!=GPIO_PIN_RESET){
+//			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_RESET);
+//		HAL_Delay(500); //暂定2s
+//		}
+//	}
+    HAL_Delay(2000);
+    WorC=0;
+}
+void work(){
+    if(WorC==0 && deverse ==1){
+        lcd_clear();
+        lcd_put_cur(0, 0);
+        lcd_send_string(" DEV ");
+        lcd_send_string("IS ");
+        lcd_send_string("WORKING");
+
+        lcd_put_cur(1, 0);
+        lcd_send_string("FROM T&J PRODUCE");
+        deverse = 0;
+    }
+    else if(WorC==1)
+        cry();
+}
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+    if(GPIO_Pin == GPIO_PIN_5)
+    {
+        WorC = 1;
+        deverse = 1;
+        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_SET);
+    }
+}
 /* USER CODE END 0 */
 
 /**
@@ -416,6 +480,7 @@ int main(void)
 /** ################################## ppy ################################## */
 /** ################################## sjj ################################## */
 /** ################################## tyj ################################## */
+    initmodule();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -450,6 +515,7 @@ int main(void)
 /** ################################## ppy ################################## */
 /** ################################## sjj ################################## */
 /** ################################## tyj ################################## */
+    work();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -618,34 +684,61 @@ static void MX_GPIO_Init(void)
   GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, LCD1602D7_Pin|LCD1602D3_Pin|LCD1602D4_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, LCD1602RS_Pin|LCD1602RW_Pin|LCD1602E_Pin|LCD1602D0_Pin
+                          |LCD1602D1_Pin|LCD1602D2_Pin|LEDDHT___Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : PA1 */
-  GPIO_InitStruct.Pin = GPIO_PIN_1;
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, LCD1602D5_Pin|LCD1602D6_Pin|VOICE___Pin|VOICE_G_Pin
+                          |DHT11_power_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pins : LCD1602D7_Pin LCD1602D3_Pin LCD1602D4_Pin */
+  GPIO_InitStruct.Pin = LCD1602D7_Pin|LCD1602D3_Pin|LCD1602D4_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : DHT11_data_Pin */
+  GPIO_InitStruct.Pin = DHT11_data_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  HAL_GPIO_Init(DHT11_data_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : PA7 */
-  GPIO_InitStruct.Pin = GPIO_PIN_7;
+  /*Configure GPIO pins : LCD1602RS_Pin LCD1602RW_Pin LCD1602E_Pin LCD1602D0_Pin
+                           LCD1602D1_Pin LCD1602D2_Pin LEDDHT___Pin */
+  GPIO_InitStruct.Pin = LCD1602RS_Pin|LCD1602RW_Pin|LCD1602E_Pin|LCD1602D0_Pin
+                          |LCD1602D1_Pin|LCD1602D2_Pin|LEDDHT___Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : PB9 */
-  GPIO_InitStruct.Pin = GPIO_PIN_9;
+  /*Configure GPIO pins : LCD1602D5_Pin LCD1602D6_Pin VOICE___Pin VOICE_G_Pin
+                           DHT11_power_Pin */
+  GPIO_InitStruct.Pin = LCD1602D5_Pin|LCD1602D6_Pin|VOICE___Pin|VOICE_G_Pin
+                          |DHT11_power_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PB5 */
+  GPIO_InitStruct.Pin = GPIO_PIN_5;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 
 }
 
