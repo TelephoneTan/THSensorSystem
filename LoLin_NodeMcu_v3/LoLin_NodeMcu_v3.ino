@@ -371,8 +371,39 @@ unsigned char next(){
     return SerialData.read();
 }
 
+void handler_FF(unsigned char ch){
+
+}
+
+void handler_FE(unsigned char ch){
+
+}
+
+void handler_default(unsigned char ch){
+  SerialLog.write(ch);
+}
+
+void detach_loop(){
+  for(;;){
+    // feed hardware WDT
+    ESP.wdtFeed();
+    unsigned char ch = next();
+    switch(ch){
+      case (unsigned char)'\xFF':
+        handler_FF(ch);
+        break;
+      case (unsigned char)'\xFE':
+        handler_FE(ch);
+        break;
+      default:
+        handler_default(ch);
+        break;
+    }
+  }
+}
+
 void loop(){
     // feed hardware WDT
     ESP.wdtFeed();
-    SerialLog.write(next());
+    detach_loop();
 }
