@@ -1,7 +1,7 @@
 /*
-´ËÎÄ¼şÊÇ llhttp ÏîÄ¿£¨6.0.1°æ±¾£©µÄÒ»²¿·Ö¡£
-llhttp ÏîÄ¿µØÖ·£ºhttps://github.com/nodejs/llhttp
-´ËÎÄ¼şÀ´Ô´£ºhttps://github.com/nodejs/node/blob/master/deps/llhttp/src/http.c
+æ­¤æ–‡ä»¶æ˜¯ llhttp é¡¹ç›®ï¼ˆ6.0.1ç‰ˆæœ¬ï¼‰çš„ä¸€éƒ¨åˆ†ã€‚
+llhttp é¡¹ç›®åœ°å€ï¼šhttps://github.com/nodejs/llhttp
+æ­¤æ–‡ä»¶æ¥æºï¼šhttps://github.com/nodejs/node/blob/master/deps/llhttp/src/http.c
 */
 #include <stdio.h>
 #ifndef LLHTTP__TEST

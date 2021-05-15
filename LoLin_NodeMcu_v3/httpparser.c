@@ -120,10 +120,10 @@ static long long last_index_of_ch(const char* s, char ch, long long before_index
 #endif // CASE_INSENSITIVE_STRSTR
 }
 
-// generator ¿ÉÄÜµ÷ÓÃÊ§°Ü¡£
-// Èç¹ûÄ³´Î generator µ÷ÓÃÊ§°Ü£¬ÄÇÃ´´Ë´Î p_head_index ÏÂ±ê²»»áÔö¼Ó£¬´Ë´Î buf Ò²²»»á±»Ð´Èë£¬
-// ´Ë´Î»¬¶¯È¡Ïû£¨Ö»ÊÇÈ¡ÏûÕâÒ»¸ö×Ö·û¾àÀëµÄ»¬¶¯£¬²»ÊÇÈ¡ÏûËùÓÐ»¬¶¯£©£¬Í¬Ê±Á¢¼´Í£Ö¹»¬¶¯¡£
-// ·µ»ØÖµ£º³É¹¦»¬¶¯µÄ¾àÀë£¨×Ö·ûÎªµ¥Î»£©
+// generator å¯èƒ½è°ƒç”¨å¤±è´¥ã€‚
+// å¦‚æžœæŸæ¬¡ generator è°ƒç”¨å¤±è´¥ï¼Œé‚£ä¹ˆæ­¤æ¬¡ p_head_index ä¸‹æ ‡ä¸ä¼šå¢žåŠ ï¼Œæ­¤æ¬¡ buf ä¹Ÿä¸ä¼šè¢«å†™å…¥ï¼Œ
+// æ­¤æ¬¡æ»‘åŠ¨å–æ¶ˆï¼ˆåªæ˜¯å–æ¶ˆè¿™ä¸€ä¸ªå­—ç¬¦è·ç¦»çš„æ»‘åŠ¨ï¼Œä¸æ˜¯å–æ¶ˆæ‰€æœ‰æ»‘åŠ¨ï¼‰ï¼ŒåŒæ—¶ç«‹å³åœæ­¢æ»‘åŠ¨ã€‚
+// è¿”å›žå€¼ï¼šæˆåŠŸæ»‘åŠ¨çš„è·ç¦»ï¼ˆå­—ç¬¦ä¸ºå•ä½ï¼‰
 static size_t bm_shift(size_t* p_head_index, size_t num, char *buf, GENERATOR_FUNCTION_TYPE* generator, GENERATOR_PARAM_TYPE* generator_param_p, char* generated_buf, size_t generated_buf_len, size_t *generated_used_len_p) {
 	if (generator)
 	{
@@ -352,7 +352,7 @@ static char generator_wrapper(void* generator_wrapper_param_p, int* continue_fla
 		char read_ch = generator(gpp, continue_flag);
 		if (*continue_flag)
 		{
-			// Ö»ÓÐ generator µ÷ÓÃ³É¹¦£¬²Å°Ñ generator µÄ·µ»Ø×Ö·û·ÅÈë»º³åÇø
+			// åªæœ‰ generator è°ƒç”¨æˆåŠŸï¼Œæ‰æŠŠ generator çš„è¿”å›žå­—ç¬¦æ”¾å…¥ç¼“å†²åŒº
 			generated_buffer->add(generated_buffer, &((char_node) {.ch = read_ch}));
 			gwpp->next_read_buffer_index = generated_buffer->size;
 		}

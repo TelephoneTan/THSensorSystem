@@ -177,8 +177,11 @@ void logme_init() {
 
 #elif defined(V_BARE_METAL)
 
-    while (!logme_prepare());
-    prepared = 1;
+    if (!prepared)
+    {
+        while (!logme_prepare());
+        prepared = 1;
+    }
 
 #endif // LOGME_WINDOWS
 }
@@ -221,7 +224,7 @@ static void format_time(char* output, size_t len) {
 #else
     time_t
 #endif // V_BARE_METAL
-            rawtime;
+        rawtime;
 
     struct tm timeinfo;
 
@@ -315,15 +318,15 @@ static void log_me_bt__(const char* text, ...) {
     tt == text ? 0 : free(tt);
 }
 
-const struct LogMe LogMe = {
-        log_me_i__,
-        log_me_w__,
-        log_me_e__,
-        log_me_n__,
-        log_me_b__,
-        log_me_it__,
-        log_me_wt__,
-        log_me_et__,
-        log_me_nt__,
-        log_me_bt__
+const struct LogMe LogMe = { 
+    log_me_i__, 
+    log_me_w__, 
+    log_me_e__, 
+    log_me_n__,
+    log_me_b__,
+    log_me_it__,
+    log_me_wt__,
+    log_me_et__,
+    log_me_nt__,
+    log_me_bt__
 };
