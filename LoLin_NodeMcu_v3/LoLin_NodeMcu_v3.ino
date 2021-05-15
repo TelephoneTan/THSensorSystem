@@ -35,6 +35,7 @@ String local_ip;
 String mac_address;
 String mac_address_no_delimiter;
 String gateway_ip;
+int wifi_index = -1;
 
 void hw_wdt_disable(){
   *((volatile uint32_t*) 0x60000900) &= ~(1); // Hardware WDT OFF
@@ -42,6 +43,10 @@ void hw_wdt_disable(){
 
 void hw_wdt_enable(){
   *((volatile uint32_t*) 0x60000900) |= 1; // Hardware WDT ON
+}
+
+int is_wifi_connected(){
+    return WiFi.status() == WL_CONNECTED;
 }
 
 void ensure_wifi(){
@@ -58,6 +63,7 @@ void ensure_wifi(){
             ESP.wdtFeed();
             if (cnt_res == WL_CONNECTED) {
                 SerialLog.printf("WiFi Connected to: %s\n", ssid[i]);
+                wifi_index = i;
                 break;
             }
         }
@@ -75,6 +81,7 @@ void ensure_wifi(){
     SerialLog.println(mac_address_no_delimiter);
     SerialLog.printf("WiFi gateway ip: ");
     SerialLog.println(gateway_ip);
+    SerialLog.printf("WiFi index = %d\n", wifi_index);
 }
 
 typedef struct generator_params {
@@ -96,6 +103,9 @@ int printHttpHeader(vlist this_vlist, long i, void* extra) {
 }
 
 void login(const char *host, int port, const char *query_string, int no_replace){
+    if(!is_wifi_connected() || wifi_index == 0){
+        return;
+    }
     SyncClient client_login;
     for(int i = 0; i < 3 && !(client_login.connected()); i++){
         client_login.connect(host, port);
@@ -323,7 +333,7 @@ void reboot_machine(){
 }
 
 void reboot_if_wifi_connected_else_ensure_wifi(){
-    if(WiFi.status() == WL_CONNECTED){
+    if(is_wifi_connected()){
         SerialLog.printf("<<<<<<<<<<<<<< WiFi Connected, reboot...\n");
         reboot_machine();
     }else{
