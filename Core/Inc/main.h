@@ -88,6 +88,9 @@ void Error_Handler(void);
 #define VOICE___GPIO_Port GPIOB
 #define VOICE_G_Pin GPIO_PIN_4
 #define VOICE_G_GPIO_Port GPIOB
+#define VOICE_data_Pin GPIO_PIN_5
+#define VOICE_data_GPIO_Port GPIOB
+#define VOICE_data_EXTI_IRQn EXTI9_5_IRQn
 #define DHT11_power_Pin GPIO_PIN_9
 #define DHT11_power_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
