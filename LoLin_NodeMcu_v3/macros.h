@@ -30,6 +30,11 @@ extern "C" {
 #endif // __linux__
 #endif // _MSC_VER
 
+#if !defined(LOGME_WINDOWS) && !defined(LOGME_LINUX)
+#define LOGME_BARE_METAL
+#define V_BARE_METAL
+#endif // !defined(LOGME_WINDOWS) && !defined(LOGME_LINUX)
+
 #ifdef __cplusplus
 }
 #endif
