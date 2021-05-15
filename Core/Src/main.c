@@ -480,6 +480,7 @@ int main(void)
 /** ################################## ppy ################################## */
 /** ################################## sjj ################################## */
 /** ################################## tyj ################################## */
+    initmodule();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -496,8 +497,22 @@ int main(void)
       int res = dht_readTemperatureAndHumidity(getPin(GPIOA, GPIO_PIN_1), dht_sensor_type_DHT11, dht_temperature_scale_Celcius, &temperature, &humidity);
       if (res){
           LogMe.bt("Temperature = %f (C), Humidity = %f", temperature, humidity);
+          char hu[10];
+          char tem[10];
+          vitoa(temperature, tem, sizeof(tem));
+          vitoa(humidity, hu, sizeof(hu));
+          lcd_clear();
+          lcd_put_cur(0,0);
+          lcd_send_string(hu);
+          lcd_put_cur(1,0);
+          lcd_send_string(tem);
       } else{
           LogMe.bt("Temperature = Fail (C), Humidity = Fail");
+          lcd_clear();
+          lcd_put_cur(0,0);
+          lcd_send_string("Read");
+          lcd_put_cur(1,0);
+          lcd_send_string("Fail");
       }
       HAL_UART_Transmit(&huart1, WELCOME, strlen(WELCOME), 0xFFFFFFFF);
 //      HAL_Delay(2100);
@@ -505,6 +520,7 @@ int main(void)
 /** ################################## ppy ################################## */
 /** ################################## sjj ################################## */
 /** ################################## tyj ################################## */
+    work();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
