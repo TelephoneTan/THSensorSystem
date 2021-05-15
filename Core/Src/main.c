@@ -420,6 +420,8 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "EndlessLoop"
   while (1)
   {
 /** ################################## tlf ################################## */
@@ -432,10 +434,17 @@ int main(void)
       int res = dht_readTemperatureAndHumidity(getPin(GPIOA, GPIO_PIN_1), dht_sensor_type_DHT11, dht_temperature_scale_Celcius, &temperature, &humidity);
       if (res){
           LogMe.bt("Temperature = %f (C), Humidity = %f", temperature, humidity);
+          unsigned char tem_i = temperature;
+          unsigned char tem_f = ((long)(temperature*100))-(((long)temperature)*100);
+          unsigned char hum = humidity;
+          HAL_UART_Transmit(&huart1, "\xFF", 1, 0xFFFFFFFF);
+          HAL_UART_Transmit(&huart1, &tem_i, 1, 0xFFFFFFFF);
+          HAL_UART_Transmit(&huart1, &tem_f, 1, 0xFFFFFFFF);
+          HAL_UART_Transmit(&huart1, &hum, 1, 0xFFFFFFFF);
       } else{
           LogMe.bt("Temperature = Fail (C), Humidity = Fail");
       }
-      HAL_UART_Transmit(&huart1, WELCOME, strlen(WELCOME), 0xFFFFFFFF);
+      HAL_UART_Transmit(&huart1, WELCOME"\n", strlen(WELCOME"\n"), 0xFFFFFFFF);
 //      HAL_Delay(2100);
       delayUs_tim_long_long(2100000ULL);
 /** ################################## ppy ################################## */
@@ -449,6 +458,7 @@ int main(void)
 /** ################################## sjj ################################## */
 /** ################################## tyj ################################## */
   }
+#pragma clang diagnostic pop
   /* USER CODE END 3 */
 }
 

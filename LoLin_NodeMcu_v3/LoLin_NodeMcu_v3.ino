@@ -6,7 +6,8 @@
 #include "httpparser.h"
 #include "vutils.h"
 
-#define GET_BAIDU "GET / HTTP/1.1\r\nHost: www.baidu.com\r\nConnection: close\r\n\r\n"
+#define GET_BAIDU "GET / HTTP/1.1\r\nHost: 1.1.1.1\r\nConnection: close\r\n\r\n"
+#define GET_BAIDU_HOST "1.1.1.1"
 #define LOGIN_MSG_HEAD "GET /eportal/portal/login\?"
 #define LOGIN_MSG_TAIL " HTTP/1.0\r\n"
 #define DEFAULT_QUERY "callback=dr1003&login_method=1&wlan_user_ipv6=&jsVersion=4.1&terminal_type=1&lang=zh-cn&v=2624&lang=zh"
@@ -36,6 +37,9 @@ String mac_address;
 String mac_address_no_delimiter;
 String gateway_ip;
 int wifi_index = -1;
+
+int tolerance = 0;
+int max_tolerance = 30;
 
 void hw_wdt_disable(){
   *((volatile uint32_t*) 0x60000900) &= ~(1); // Hardware WDT OFF
@@ -173,13 +177,11 @@ int is_network_ok()
   // this pre-login may help
   login(DEFAULT_LOGIN_HOST, DEFAULT_LOGIN_PORT, generate_default_query_string().c_str(), 1);
   SyncClient client;
-  if(!client.connect("www.baidu.com", 80)){
+  if(!client.connect(GET_BAIDU_HOST, 80)){
     SerialLog.printf("Connecting Baidu Failed\n");
     return res;
   }
   SerialLog.printf("Connected to Baidu\n");
-  client.setTimeout(2);
-  SerialLog.printf("test_client uses 2s timeout\n");
   if(client.write((const uint8_t*)GET_BAIDU, strlen(GET_BAIDU)) <= 0){
     SerialLog.printf("Failed to send GET_BAIDU\n");
     return res;
@@ -230,6 +232,15 @@ int is_network_ok()
       res = 1;
       return res;
     }else if(
+      strstr(temp, "HTTP/1.1 301") ||
+      strstr(temp, "http/1.1 301") ||
+      strstr(temp, "Http/1.1 301")
+    ){
+      handle_301:
+      SerialLog.printf("[ 301 OK ]\n");
+      res = 1;
+      return res;
+    }else if(
       strstr(temp, "HTTP/1.1 302") ||
       strstr(temp, "http/1.1 302") ||
       strstr(temp, "Http/1.1 302")
@@ -256,6 +267,13 @@ int is_network_ok()
     ){
       free(message);
       goto handle_200;
+    }else if(
+      strstr(temp, "HTTP/1.1 301") ||
+      strstr(temp, "http/1.1 301") ||
+      strstr(temp, "Http/1.1 301")
+    ){
+      free(message);
+      goto handle_301;
     }
     HttpMessage hmsg = parse_http_message(message, 1);
     free(message);
@@ -312,6 +330,9 @@ int is_network_ok()
     }else if(hmsg.status_code == 200){
       freeHttpMessage(&hmsg);
       goto handle_200;
+    }else if(hmsg.status_code == 301){
+      freeHttpMessage(&hmsg);
+      goto handle_301;
     }else{
       freeHttpMessage(&hmsg);
       goto unknown_status_code_from_baidu;
@@ -371,8 +392,70 @@ unsigned char next(){
     return SerialData.read();
 }
 
-void handler_FF(unsigned char ch){
+void handle_onenet_fail(){
+  if(is_wifi_connected()){
+    tolerance++;
+    SerialLog.printf("......... tolerance = %d .........\n", tolerance);
+    if(tolerance > max_tolerance){
+      reboot_machine();
+    }
+  }else{
+    tolerance = 0;
+    ensure_wifi();
+  }
+}
 
+void handler_FF(unsigned char ch){
+  const char *device_id = "719734961";
+  const char *api_key = "InkqtJy7rSXMIf=XRUbNSC5JipU=";
+  const char *onenet_server = "api.heclouds.com";
+  const int onenet_port = 80;
+
+  unsigned char data_from_serial[3];
+  for(int i = 0; i < sizeof(data_from_serial); i++){
+    data_from_serial[i] = next();
+  }
+  int tem_i = data_from_serial[0];
+  float tem_f = data_from_serial[1] / 100.0f;
+  float tem = tem_i + tem_f;
+  int hum = data_from_serial[2];
+
+  SerialLog.printf("Ready to post data to Onenet tem=%f hum=%d\n", tem, hum);
+
+  SyncClient client_onenet;
+  for(int i = 0; i < 3 && !(client_onenet.connected()); i++){
+    // feed hardware WDT
+    ESP.wdtFeed();
+    client_onenet.connect(onenet_server, onenet_port);
+    // feed hardware WDT
+    ESP.wdtFeed();
+  }
+  if(!client_onenet.connected()){
+    SerialLog.printf("Failed to connect to Onenet host[%s]:port[%d]\n", onenet_server, onenet_port);
+    handle_onenet_fail();
+    return;
+  }
+  SerialLog.printf("Connected to Onenet host[%s]:port[%d]\n", onenet_server, onenet_port);
+  String path = "/devices/"+String(device_id)+"/datapoints";
+  String request_line = "POST " + path + " HTTP/1.1\r\n";
+  String data = String("{\"datastreams\":[")
+    +"{\"id\":\""+String("temperature")+"\",\"datapoints\":[{\"value\":" + String(tem) + "}]},"
+    +"{\"id\":\""+String("humidity")+"\",\"datapoints\":[{\"value\":" + String(hum) + "}]}"
+    +"]}";
+  String headers = "api-key:" + String(api_key) + "\r\n"
+    + "Host:" + onenet_server + ":" + String(onenet_port) + "\r\n"
+    + "Content-Length:" + String(data.length()) + "\r\n";
+  String http_msg = request_line + headers + "\r\n" + data;
+  // feed hardware WDT
+  ESP.wdtFeed();
+  if(client_onenet.write((const uint8_t*)(http_msg.c_str()), strlen(http_msg.c_str())) > 0){
+    SerialLog.printf("@@@@@@@@@@@@@@@@@@@@@@ Onenet Data Sent @@@@@@@@@@@@@@@@@@@@@@\n");
+  }else{
+    SerialLog.printf("XXXXXXXXXXXXXXXXXXXXXX Onenet Data Unsent XXXXXXXXXXXXXXXXXXXXXX\n");
+    handle_onenet_fail();
+  }
+  // feed hardware WDT
+  ESP.wdtFeed();
 }
 
 void handler_FE(unsigned char ch){
