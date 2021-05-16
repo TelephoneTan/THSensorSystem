@@ -493,9 +493,9 @@ int main(void)
   while (1)
   {
 /** ################################## tlf ################################## */
-      vlist list = make_vlist(5);
-      char *rabbit = zero_malloc(5);
-      if (rabbit == NULL) continue;
+//      vlist list = make_vlist(5);
+//      char *rabbit = zero_malloc(5);
+//      if (rabbit == NULL) continue;
 //      LogMe.b("%s", WELCOME);
       LogMe.bt("%s", WELCOME);
       float temperature, humidity;
