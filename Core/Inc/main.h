@@ -82,8 +82,16 @@ void Error_Handler(void);
 #define LCD1602D5_GPIO_Port GPIOB
 #define LCD1602D6_Pin GPIO_PIN_1
 #define LCD1602D6_GPIO_Port GPIOB
+#define SerialLog_TX_Pin GPIO_PIN_10
+#define SerialLog_TX_GPIO_Port GPIOB
+#define SerialLog_RX_Pin GPIO_PIN_11
+#define SerialLog_RX_GPIO_Port GPIOB
 #define GND_Pin GPIO_PIN_12
 #define GND_GPIO_Port GPIOB
+#define SerialData_TX_Pin GPIO_PIN_9
+#define SerialData_TX_GPIO_Port GPIOA
+#define SerialData_RX_Pin GPIO_PIN_10
+#define SerialData_RX_GPIO_Port GPIOA
 #define V_5V_Output_Pin GPIO_PIN_11
 #define V_5V_Output_GPIO_Port GPIOA
 #define V_5V_OutputA12_Pin GPIO_PIN_12
