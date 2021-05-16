@@ -82,10 +82,12 @@ void Error_Handler(void);
 #define LCD1602D5_GPIO_Port GPIOB
 #define LCD1602D6_Pin GPIO_PIN_1
 #define LCD1602D6_GPIO_Port GPIOB
-#define LEDDHT___Pin GPIO_PIN_11
-#define LEDDHT___GPIO_Port GPIOA
-#define V_5V_Output_Pin GPIO_PIN_12
+#define GND_Pin GPIO_PIN_12
+#define GND_GPIO_Port GPIOB
+#define V_5V_Output_Pin GPIO_PIN_11
 #define V_5V_Output_GPIO_Port GPIOA
+#define V_5V_OutputA12_Pin GPIO_PIN_12
+#define V_5V_OutputA12_GPIO_Port GPIOA
 #define VOICE___Pin GPIO_PIN_3
 #define VOICE___GPIO_Port GPIOB
 #define VOICE_G_Pin GPIO_PIN_4
