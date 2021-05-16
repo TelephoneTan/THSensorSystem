@@ -39,7 +39,7 @@ String gateway_ip;
 int wifi_index = -1;
 
 int tolerance = 0;
-int max_tolerance = 30;
+int max_tolerance = 300;
 
 void hw_wdt_disable(){
   *((volatile uint32_t*) 0x60000900) &= ~(1); // Hardware WDT OFF
@@ -458,8 +458,56 @@ void handler_FF(unsigned char ch){
   ESP.wdtFeed();
 }
 
-void handler_FE(unsigned char ch){
+void handler_FC(unsigned char ch){
+  const char *device_id = "719734961";
+  const char *api_key = "InkqtJy7rSXMIf=XRUbNSC5JipU=";
+  const char *onenet_server = "api.heclouds.com";
+  const int onenet_port = 80;
 
+  unsigned char data_from_serial[3];
+  for(int i = 0; i < sizeof(data_from_serial); i++){
+    data_from_serial[i] = next();
+  }
+  int is_caused_by_digital_in = data_from_serial[0];
+  unsigned int analog_value = (((unsigned int)(data_from_serial[1]))<<8)+data_from_serial[2];
+
+  SerialLog.printf("Ready to post data to Onenet voice_av=%u%s\n", analog_value, 
+    is_caused_by_digital_in?" (digital wake up)":" (normal)");
+
+  SyncClient client_onenet;
+  for(int i = 0; i < 3 && !(client_onenet.connected()); i++){
+    // feed hardware WDT
+    ESP.wdtFeed();
+    client_onenet.connect(onenet_server, onenet_port);
+    // feed hardware WDT
+    ESP.wdtFeed();
+  }
+  if(!client_onenet.connected()){
+    SerialLog.printf("Failed to connect to Onenet host[%s]:port[%d]\n", onenet_server, onenet_port);
+    handle_onenet_fail();
+    return;
+  }
+  SerialLog.printf("Connected to Onenet host[%s]:port[%d]\n", onenet_server, onenet_port);
+  String path = "/devices/"+String(device_id)+"/datapoints";
+  String request_line = "POST " + path + " HTTP/1.1\r\n";
+  String datastream_id = is_caused_by_digital_in?String("cry"):String("voice");
+  String data = String("{\"datastreams\":[")
+    +"{\"id\":\""+datastream_id+"\",\"datapoints\":[{\"value\":" + String(analog_value) + "}]}"
+    +"]}";
+  String headers = "api-key:" + String(api_key) + "\r\n"
+    + "Host:" + onenet_server + ":" + String(onenet_port) + "\r\n"
+    + "Content-Length:" + String(data.length()) + "\r\n";
+  String http_msg = request_line + headers + "\r\n" + data;
+  // feed hardware WDT
+  ESP.wdtFeed();
+  if(client_onenet.write((const uint8_t*)(http_msg.c_str()), strlen(http_msg.c_str())) > 0){
+    SerialLog.printf("@@@@@@@@@@@@@@@@@@@@@@ Onenet Data Sent @@@@@@@@@@@@@@@@@@@@@@\n");
+  }else{
+    SerialLog.printf("XXXXXXXXXXXXXXXXXXXXXX Onenet Data Unsent XXXXXXXXXXXXXXXXXXXXXX\n");
+    handle_onenet_fail();
+  }
+  // feed hardware WDT
+  ESP.wdtFeed();
 }
 
 void handler_default(unsigned char ch){
@@ -475,8 +523,8 @@ void detach_loop(){
       case (unsigned char)'\xFF':
         handler_FF(ch);
         break;
-      case (unsigned char)'\xFE':
-        handler_FE(ch);
+      case (unsigned char)'\xFC':
+        handler_FC(ch);
         break;
       default:
         handler_default(ch);

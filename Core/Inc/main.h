@@ -58,6 +58,8 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define VOICE_Analog_in_Pin GPIO_PIN_0
+#define VOICE_Analog_in_GPIO_Port GPIOC
 #define LCD1602D7_Pin GPIO_PIN_2
 #define LCD1602D7_GPIO_Port GPIOC
 #define DHT11_data_Pin GPIO_PIN_1
@@ -100,9 +102,9 @@ void Error_Handler(void);
 #define VOICE___GPIO_Port GPIOB
 #define VOICE_G_Pin GPIO_PIN_4
 #define VOICE_G_GPIO_Port GPIOB
-#define VOICE_data_Pin GPIO_PIN_5
-#define VOICE_data_GPIO_Port GPIOB
-#define VOICE_data_EXTI_IRQn EXTI9_5_IRQn
+#define VOICE_Digital_in_Pin GPIO_PIN_5
+#define VOICE_Digital_in_GPIO_Port GPIOB
+#define VOICE_Digital_in_EXTI_IRQn EXTI9_5_IRQn
 #define DHT11_power_Pin GPIO_PIN_9
 #define DHT11_power_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
