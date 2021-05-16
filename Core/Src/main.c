@@ -475,6 +475,7 @@ int main(void)
     logme_init();
 //    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, GPIO_PIN_SET);
     DHT_digitalWrite(getPin(GPIOB, GPIO_PIN_9), DHT_PIN_VALUE_HIGH);
+    DHT_digitalWrite(getPin(GPIOA, GPIO_PIN_12), DHT_PIN_VALUE_HIGH);
     HAL_Delay(1100); // wait for DHT to be stable
     dht_init(getPin(GPIOA, GPIO_PIN_1));
 /** ################################## ppy ################################## */
@@ -696,8 +697,13 @@ static void MX_GPIO_Init(void)
                           |LCD1602D1_Pin|LCD1602D2_Pin|LEDDHT___Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, LCD1602D5_Pin|LCD1602D6_Pin|VOICE___Pin|VOICE_G_Pin
-                          |DHT11_power_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, LCD1602D5_Pin|LCD1602D6_Pin|VOICE___Pin|VOICE_G_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(V_5V_Output_GPIO_Port, V_5V_Output_Pin, GPIO_PIN_SET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(DHT11_power_GPIO_Port, DHT11_power_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pins : LCD1602D7_Pin LCD1602D3_Pin LCD1602D4_Pin */
   GPIO_InitStruct.Pin = LCD1602D7_Pin|LCD1602D3_Pin|LCD1602D4_Pin;
@@ -713,9 +719,9 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(DHT11_data_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : LCD1602RS_Pin LCD1602RW_Pin LCD1602E_Pin LCD1602D0_Pin
-                           LCD1602D1_Pin LCD1602D2_Pin LEDDHT___Pin */
+                           LCD1602D1_Pin LCD1602D2_Pin LEDDHT___Pin V_5V_Output_Pin */
   GPIO_InitStruct.Pin = LCD1602RS_Pin|LCD1602RW_Pin|LCD1602E_Pin|LCD1602D0_Pin
-                          |LCD1602D1_Pin|LCD1602D2_Pin|LEDDHT___Pin;
+                          |LCD1602D1_Pin|LCD1602D2_Pin|LEDDHT___Pin|V_5V_Output_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
