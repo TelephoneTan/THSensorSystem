@@ -434,7 +434,7 @@ void send_voice_analog_value_to_serial_data(int is_caused_by_digital_in, unsigne
     unsigned char is_d = is_caused_by_digital_in?1U:0U;
     unsigned char av_high = analog_v>>8;
     unsigned char av_low = analog_v;
-    HAL_UART_Transmit(&huart1, "\xFC", 1, 0xFFFFFFFF);
+    HAL_UART_Transmit(&huart1, "\xF0", 1, 0xFFFFFFFF);
     HAL_UART_Transmit(&huart1, &is_d, 1, 0xFFFFFFFF);
     HAL_UART_Transmit(&huart1, &av_high, 1, 0xFFFFFFFF);
     HAL_UART_Transmit(&huart1, &av_low, 1, 0xFFFFFFFF);

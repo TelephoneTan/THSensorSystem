@@ -458,7 +458,7 @@ void handler_FF(unsigned char ch){
   ESP.wdtFeed();
 }
 
-void handler_FC(unsigned char ch){
+void handler_F0(unsigned char ch){
   const char *device_id = "719734961";
   const char *api_key = "InkqtJy7rSXMIf=XRUbNSC5JipU=";
   const char *onenet_server = "api.heclouds.com";
@@ -523,8 +523,8 @@ void detach_loop(){
       case (unsigned char)'\xFF':
         handler_FF(ch);
         break;
-      case (unsigned char)'\xFC':
-        handler_FC(ch);
+      case (unsigned char)'\xF0':
+        handler_F0(ch);
         break;
       default:
         handler_default(ch);
