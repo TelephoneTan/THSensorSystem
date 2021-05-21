@@ -3,6 +3,11 @@
 
 #include <stdint.h>
 
+/**
+ * Return an integer according to the key pressed.
+ * @note This function will block until any key is pressed.
+ * @return 0~15
+ */
 uint16_t read_keypad (void);
 
 extern const uint16_t keyboard_C1_Pin__;
