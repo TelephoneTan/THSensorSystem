@@ -22,7 +22,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "sign.h"
 /** ################################## tlf ################################## */
+#ifdef TLF
 #include <string.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -33,43 +35,86 @@
 #include "logme.h"
 #include "DHT.h"
 #include "pins.h"
+#endif
+/** ################################## wxm ################################## */
+#ifdef WXM
+#endif
 /** ################################## ppy ################################## */
+#ifdef PPY
+#endif
 /** ################################## sjj ################################## */
+#ifdef SJJ
 #include "keypad.h"
 #include "pins.h"
+#endif
 /** ################################## tyj ################################## */
+#ifdef TYJ
 #include "LCD1602.h"
+#endif
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 /** ################################## tlf ################################## */
+#ifdef TLF
 typedef enum GPIO_OutputLevel{
     GPIO_OutputLevel_LOW = GPIO_PIN_RESET,
     GPIO_OutputLevel_HIGH = GPIO_PIN_SET,
     GPIO_OutputLevel_NOT_OUTPUT
 } GPIO_OutputLevel;
+#endif
+/** ################################## wxm ################################## */
+#ifdef WXM
+#endif
 /** ################################## ppy ################################## */
+#ifdef PPY
+#endif
 /** ################################## sjj ################################## */
+#ifdef SJJ
+#endif
 /** ################################## tyj ################################## */
+#ifdef TYJ
+#endif
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 /** ################################## tlf ################################## */
+#ifdef TLF
 //#define LOG_USING_SERIAL_DATA
+#endif
+/** ################################## wxm ################################## */
+#ifdef WXM
+#endif
 /** ################################## ppy ################################## */
+#ifdef PPY
+#endif
 /** ################################## sjj ################################## */
+#ifdef SJJ
+#endif
 /** ################################## tyj ################################## */
+#ifdef TYJ
+#endif
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 /** ################################## tlf ################################## */
+#ifdef TLF
 #define WELCOME "hello, world! From THSensorSystem :)"
+#endif
+/** ################################## wxm ################################## */
+#ifdef WXM
+#endif
 /** ################################## ppy ################################## */
+#ifdef PPY
+#endif
 /** ################################## sjj ################################## */
+#ifdef SJJ
+#endif
 /** ################################## tyj ################################## */
+#ifdef TYJ
+#endif
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -82,8 +127,16 @@ UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
 /** ################################## tlf ################################## */
+#ifdef TLF
+#endif
+/** ################################## wxm ################################## */
+#ifdef WXM
+#endif
 /** ################################## ppy ################################## */
+#ifdef PPY
+#endif
 /** ################################## sjj ################################## */
+#ifdef SJJ
 const uint16_t keyboard_C4_Pin__ = PD2;
 const uint16_t keyboard_C3_Pin__ = PC12;
 const uint16_t keyboard_C2_Pin__ = PC11;
@@ -92,9 +145,12 @@ const uint16_t keyboard_R1_Pin__ = PC6;
 const uint16_t keyboard_R2_Pin__ = PC7;
 const uint16_t keyboard_R3_Pin__ = PC8;
 const uint16_t keyboard_R4_Pin__ = PC9;
+#endif
 /** ################################## tyj ################################## */
+#ifdef TYJ
 int WorC = 0;             //0 means work,1 cry
 int deverse = 1;			//deverce lcd
+#endif
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -106,14 +162,26 @@ static void MX_USART1_UART_Init(void);
 static void MX_ADC1_Init(void);
 /* USER CODE BEGIN PFP */
 /** ################################## tlf ################################## */
+#ifdef TLF
+#endif
+/** ################################## wxm ################################## */
+#ifdef WXM
+#endif
 /** ################################## ppy ################################## */
+#ifdef PPY
+#endif
 /** ################################## sjj ################################## */
+#ifdef SJJ
+#endif
 /** ################################## tyj ################################## */
+#ifdef TYJ
+#endif
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 /** ################################## tlf ################################## */
+#ifdef TLF
 void logme_vprintf(const char* restrict format, va_list vlist){
     char buf[2048] = {0};
     vsnprintf(buf, sizeof(buf), format, vlist);
@@ -385,8 +453,15 @@ void DHT_disable_interrupt(){
 void DHT_enable_interrupt(){
     __enable_irq();
 }
+#endif
+/** ################################## wxm ################################## */
+#ifdef WXM
+#endif
 /** ################################## ppy ################################## */
+#ifdef PPY
+#endif
 /** ################################## sjj ################################## */
+#ifdef SJJ
 void KEY_BOARD_digitalWrite(uint16_t pin, KEY_BOARD_PIN_VALUE value){
     switch (value) {
         case KEY_BOARD_PIN_VALUE_HIGH:
@@ -407,7 +482,9 @@ KEY_BOARD_PIN_VALUE KEY_BOARD_digitalRead(uint16_t pin){
             return KEY_BOARD_PIN_VALUE_LOW;
     }
 }
+#endif
 /** ################################## tyj ################################## */
+#ifdef TYJ
 void send_voice_analog_value_to_serial_data(int is_caused_by_digital_in, unsigned int analog_v){
     unsigned char is_d = is_caused_by_digital_in?1U:0U;
     unsigned char av_high = analog_v>>8;
@@ -492,6 +569,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
         }
     }
 }
+#endif
 /* USER CODE END 0 */
 
 /**
@@ -502,9 +580,20 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 /** ################################## tlf ################################## */
+#ifdef TLF
+#endif
+/** ################################## wxm ################################## */
+#ifdef WXM
+#endif
 /** ################################## ppy ################################## */
+#ifdef PPY
+#endif
 /** ################################## sjj ################################## */
+#ifdef SJJ
+#endif
 /** ################################## tyj ################################## */
+#ifdef TYJ
+#endif
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -514,9 +603,20 @@ int main(void)
 
   /* USER CODE BEGIN Init */
 /** ################################## tlf ################################## */
+#ifdef TLF
+#endif
+/** ################################## wxm ################################## */
+#ifdef WXM
+#endif
 /** ################################## ppy ################################## */
+#ifdef PPY
+#endif
 /** ################################## sjj ################################## */
+#ifdef SJJ
+#endif
 /** ################################## tyj ################################## */
+#ifdef TYJ
+#endif
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -524,9 +624,20 @@ int main(void)
 
   /* USER CODE BEGIN SysInit */
 /** ################################## tlf ################################## */
+#ifdef TLF
+#endif
+/** ################################## wxm ################################## */
+#ifdef WXM
+#endif
 /** ################################## ppy ################################## */
+#ifdef PPY
+#endif
 /** ################################## sjj ################################## */
+#ifdef SJJ
+#endif
 /** ################################## tyj ################################## */
+#ifdef TYJ
+#endif
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -537,6 +648,7 @@ int main(void)
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
 /** ################################## tlf ################################## */
+#ifdef TLF
     logme_init();
 //    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, GPIO_PIN_SET);
     DHT_digitalWrite(getPin(GPIOB, GPIO_PIN_9), DHT_PIN_VALUE_HIGH);
@@ -545,10 +657,20 @@ int main(void)
     DHT_digitalWrite(getPin(GPIOB, GPIO_PIN_12), DHT_PIN_VALUE_LOW);
     HAL_Delay(1100); // wait for DHT to be stable
     dht_init(getPin(GPIOA, GPIO_PIN_1));
+#endif
+/** ################################## wxm ################################## */
+#ifdef WXM
+#endif
 /** ################################## ppy ################################## */
+#ifdef PPY
+#endif
 /** ################################## sjj ################################## */
+#ifdef SJJ
+#endif
 /** ################################## tyj ################################## */
+#ifdef TYJ
     initmodule();
+#endif
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -558,6 +680,7 @@ int main(void)
   while (1)
   {
 /** ################################## tlf ################################## */
+#ifdef TLF
 //      vlist list = make_vlist(5);
 //      char *rabbit = zero_malloc(5);
 //      if (rabbit == NULL) continue;
@@ -580,18 +703,39 @@ int main(void)
       HAL_UART_Transmit(&huart1, WELCOME"\n", strlen(WELCOME"\n"), 0xFFFFFFFF);
 //      HAL_Delay(2100);
       delayUs_tim_long_long(2100000ULL);
+#endif
+/** ################################## wxm ################################## */
+#ifdef WXM
+#endif
 /** ################################## ppy ################################## */
+#ifdef PPY
+#endif
 /** ################################## sjj ################################## */
+#ifdef SJJ
+#endif
 /** ################################## tyj ################################## */
+#ifdef TYJ
     work();
     auto_send_voice_analog_value(0);
+#endif
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
 /** ################################## tlf ################################## */
+#ifdef TLF
+#endif
+/** ################################## wxm ################################## */
+#ifdef WXM
+#endif
 /** ################################## ppy ################################## */
+#ifdef PPY
+#endif
 /** ################################## sjj ################################## */
+#ifdef SJJ
+#endif
 /** ################################## tyj ################################## */
+#ifdef TYJ
+#endif
   }
 #pragma clang diagnostic pop
   /* USER CODE END 3 */
@@ -898,9 +1042,20 @@ void Error_Handler(void)
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
 /** ################################## tlf ################################## */
+#ifdef TLF
+#endif
+/** ################################## wxm ################################## */
+#ifdef WXM
+#endif
 /** ################################## ppy ################################## */
+#ifdef PPY
+#endif
 /** ################################## sjj ################################## */
+#ifdef SJJ
+#endif
 /** ################################## tyj ################################## */
+#ifdef TYJ
+#endif
   /* USER CODE END Error_Handler_Debug */
 }
 
