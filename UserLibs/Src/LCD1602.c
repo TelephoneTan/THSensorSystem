@@ -4,6 +4,9 @@
 
 #include "LCD1602.h"
 
+#include <stdio.h>
+#include <stdarg.h>
+
 #include "stm32f1xx_hal.h"
 
 /*********** Define the LCD PINS below ****************/
@@ -152,4 +155,17 @@ void lcd_send_string (char *str)
     while(*str!='\0'){
         lcd_send_data(*str++);
     }
+}
+
+void lcd_print(int row, int col, const char *format, ...){
+    if (row < 0 || row > 1 || col < 0 || col > 15){
+        return;
+    }
+    char str[17] = {0};
+    va_list valist_list;
+    va_start(valist_list, format);
+    vsnprintf(str, sizeof(str)-col, format, valist_list);
+    va_end(valist_list);
+    lcd_put_cur(row, col);
+    lcd_send_string(str);
 }

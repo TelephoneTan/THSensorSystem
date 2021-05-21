@@ -35,6 +35,7 @@
 #include "logme.h"
 #include "DHT.h"
 #include "pins.h"
+#include "LCD1602.h"
 #endif
 /** ################################## wxm ################################## */
 #ifdef WXM
@@ -453,6 +454,11 @@ void DHT_disable_interrupt(){
 void DHT_enable_interrupt(){
     __enable_irq();
 }
+void printTHtoLCD(float t, float h){
+    lcd_clear();
+    lcd_print(0, 0, "tem: %.2f", t);
+    lcd_print(1, 0, "hum: %.0f%%", h);
+}
 #endif
 /** ################################## wxm ################################## */
 #ifdef WXM
@@ -687,6 +693,7 @@ int main(void)
           HAL_UART_Transmit(&huart1, &tem_i, 1, 0xFFFFFFFF);
           HAL_UART_Transmit(&huart1, &tem_f, 1, 0xFFFFFFFF);
           HAL_UART_Transmit(&huart1, &hum, 1, 0xFFFFFFFF);
+          printTHtoLCD(temperature, humidity);
       } else{
           LogMe.bt("Temperature = Fail (C), Humidity = Fail");
       }
