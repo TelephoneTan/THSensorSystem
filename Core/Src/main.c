@@ -36,6 +36,7 @@
 #include "DHT.h"
 #include "pins.h"
 #include "LCD1602.h"
+#include "keypad.h"
 #endif
 /** ################################## wxm ################################## */
 #ifdef WXM
