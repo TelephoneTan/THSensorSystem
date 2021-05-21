@@ -35,6 +35,8 @@
 #include "pins.h"
 /** ################################## ppy ################################## */
 /** ################################## sjj ################################## */
+#include "keypad.h"
+#include "pins.h"
 /** ################################## tyj ################################## */
 #include "LCD1602.h"
 /* USER CODE END Includes */
@@ -82,6 +84,14 @@ UART_HandleTypeDef huart3;
 /** ################################## tlf ################################## */
 /** ################################## ppy ################################## */
 /** ################################## sjj ################################## */
+const uint16_t keyboard_C1_Pin__ = PC6;
+const uint16_t keyboard_C2_Pin__ = PC7;
+const uint16_t keyboard_C3_Pin__ = PC8;
+const uint16_t keyboard_C4_Pin__ = PC9;
+const uint16_t keyboard_R1_Pin__ = PC10;
+const uint16_t keyboard_R2_Pin__ = PC11;
+const uint16_t keyboard_R3_Pin__ = PC12;
+const uint16_t keyboard_R4_Pin__ = PD2;
 /** ################################## tyj ################################## */
 int WorC=0;             //0 means work,1 cry
 int deverse=0;			//deverce lcd
@@ -377,13 +387,64 @@ void DHT_enable_interrupt(){
 }
 /** ################################## ppy ################################## */
 /** ################################## sjj ################################## */
+void KEY_BOARD_digitalWrite(uint16_t pin, KEY_BOARD_PIN_VALUE value){
+    switch (value) {
+        case KEY_BOARD_PIN_VALUE_HIGH:
+            DHT_digitalWrite(pin, DHT_PIN_VALUE_HIGH);
+            break;
+        case KEY_BOARD_PIN_VALUE_LOW:
+            DHT_digitalWrite(pin, DHT_PIN_VALUE_LOW);
+            break;
+        default:;
+    }
+}
+KEY_BOARD_PIN_VALUE KEY_BOARD_digitalRead(uint16_t pin){
+    switch (DHT_digitalRead(pin)) {
+        default:
+        case DHT_PIN_VALUE_HIGH:
+            return KEY_BOARD_PIN_VALUE_HIGH;
+        case DHT_PIN_VALUE_LOW:
+            return KEY_BOARD_PIN_VALUE_LOW;
+    }
+}
 /** ################################## tyj ################################## */
+void send_voice_analog_value_to_serial_data(int is_caused_by_digital_in, unsigned int analog_v){
+    unsigned char is_d = is_caused_by_digital_in?1U:0U;
+    unsigned char av_high = analog_v>>8;
+    unsigned char av_low = analog_v;
+    HAL_UART_Transmit(&huart1, "\xF0", 1, 0xFFFFFFFF);
+    HAL_UART_Transmit(&huart1, &is_d, 1, 0xFFFFFFFF);
+    HAL_UART_Transmit(&huart1, &av_high, 1, 0xFFFFFFFF);
+    HAL_UART_Transmit(&huart1, &av_low, 1, 0xFFFFFFFF);
+}
+unsigned int get_voice_av(){
+    HAL_ADC_Start(&hadc1);
+    if (HAL_ADC_PollForConversion(&hadc1, 50) == HAL_OK){
+        return HAL_ADC_GetValue(&hadc1);
+    }else{
+        return UINT_MAX;
+    }
+}
+void auto_send_voice_analog_value (int is_caused_by_digital_in) {
+    unsigned int voice_av = get_voice_av();
+    if (voice_av != UINT_MAX){
+        LogMe.it("%sread voice_av = %u", is_caused_by_digital_in?"Caused by Digital input: ":"", voice_av);
+        send_voice_analog_value_to_serial_data(is_caused_by_digital_in, voice_av);
+    } else{
+        LogMe.et("%sread voice_av Fail", is_caused_by_digital_in?"Caused by Digital input: ":"");
+    }
+}
 /*
  * Init lcd
  * Make voice_module work
  */
 void initmodule(){
-    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin (keyboard_R1_GPIO_Port, keyboard_R1_Pin, GPIO_PIN_RESET);  //Pull the R1 low
+	HAL_GPIO_WritePin (keyboard_R2_GPIO_Port, keyboard_R2_Pin, GPIO_PIN_SET);  // Pull the R2 High
+	HAL_GPIO_WritePin (keyboard_R3_GPIO_Port, keyboard_R3_Pin, GPIO_PIN_SET);  // Pull the R3 High
+	HAL_GPIO_WritePin (keyboard_R4_GPIO_Port, keyboard_R4_Pin, GPIO_PIN_SET);  // Pull the R4 High
+
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, GPIO_PIN_RESET);
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_SET);
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
     lcd_init();
@@ -402,21 +463,9 @@ void cry(){
     lcd_send_string(" BABY ");
     lcd_send_string("IS ");
     lcd_send_string("CRYING");
-
-//	lcd_put_cur(1, 0);
-//	lcd_send_string("FROM T&J PRODUCE");
-//	for(int i=0;i<4;i++){
-//		HAL_Delay(500);
-//		while(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_5)!=GPIO_PIN_RESET){
-//			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_RESET);
-//		HAL_Delay(500); //暂定2s
-//		}
-//	}
-    HAL_Delay(2000);
-    WorC=0;
 }
 void work(){
-    if(WorC==0 && deverse ==1){
+    if (WorC == 0 && deverse == 1) {
         lcd_clear();
         lcd_put_cur(0, 0);
         lcd_send_string(" DEV ");
@@ -427,42 +476,21 @@ void work(){
         lcd_send_string("FROM T&J PRODUCE");
         deverse = 0;
     }
-    else if(WorC==1)
+    else if (WorC ==1 && deverse == 0) {
         cry();
-}
-void send_voice_analog_value_to_serial_data(int is_caused_by_digital_in, unsigned int analog_v){
-    unsigned char is_d = is_caused_by_digital_in?1U:0U;
-    unsigned char av_high = analog_v>>8;
-    unsigned char av_low = analog_v;
-    HAL_UART_Transmit(&huart1, "\xF0", 1, 0xFFFFFFFF);
-    HAL_UART_Transmit(&huart1, &is_d, 1, 0xFFFFFFFF);
-    HAL_UART_Transmit(&huart1, &av_high, 1, 0xFFFFFFFF);
-    HAL_UART_Transmit(&huart1, &av_low, 1, 0xFFFFFFFF);
-}
-unsigned int get_voice_av(){
-    HAL_ADC_Start(&hadc1);
-    if (HAL_ADC_PollForConversion(&hadc1, 50) == HAL_OK){
-        return HAL_ADC_GetValue(&hadc1);
-    }else{
-        return UINT_MAX;
+        deverse=1;
     }
-}
-void auto_send_voice_analog_value(int is_caused_by_digital_in){
-    unsigned int voice_av = get_voice_av();
-    if (voice_av != UINT_MAX){
-        LogMe.it("%sread voice_av = %u", is_caused_by_digital_in?"Caused by Digital input: ":"", voice_av);
-        send_voice_analog_value_to_serial_data(is_caused_by_digital_in, voice_av);
-    } else{
-        LogMe.et("%sread voice_av Fail", is_caused_by_digital_in?"Caused by Digital input: ":"");
+    if (read_keypad()==1) {
+        WorC = 0;
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, GPIO_PIN_RESET);
     }
 }
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-    if(GPIO_Pin == GPIO_PIN_5)
+    if(GPIO_Pin == VOICE_Digital_in_Pin)
     {
         WorC = 1;
-        deverse = 1;
-        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, GPIO_PIN_SET);
         auto_send_voice_analog_value(1);
     }
 }
@@ -782,9 +810,11 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
+  __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, LCD1602D7_Pin|LCD1602D3_Pin|LCD1602D4_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, LCD1602D7_Pin|LCD1602D3_Pin|LCD1602D4_Pin|keyboard_R1_Pin
+                          |keyboard_R2_Pin|keyboard_R3_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, LCD1602RS_Pin|LCD1602RW_Pin|LCD1602E_Pin|LCD1602D0_Pin
@@ -798,10 +828,15 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOA, V_5V_Output_Pin|V_5V_OutputA12_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(keyboard_R4_GPIO_Port, keyboard_R4_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(DHT11_power_GPIO_Port, DHT11_power_Pin, GPIO_PIN_SET);
 
-  /*Configure GPIO pins : LCD1602D7_Pin LCD1602D3_Pin LCD1602D4_Pin */
-  GPIO_InitStruct.Pin = LCD1602D7_Pin|LCD1602D3_Pin|LCD1602D4_Pin;
+  /*Configure GPIO pins : LCD1602D7_Pin LCD1602D3_Pin LCD1602D4_Pin keyboard_R1_Pin__
+                           keyboard_R2_Pin__ keyboard_R3_Pin__ */
+  GPIO_InitStruct.Pin = LCD1602D7_Pin|LCD1602D3_Pin|LCD1602D4_Pin|keyboard_R1_Pin
+                          |keyboard_R2_Pin|keyboard_R3_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -830,6 +865,19 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : keyboard_C1_Pin__ keyboard_C2_Pin__ keyboard_C3_Pin__ keyboard_C4_Pin__ */
+  GPIO_InitStruct.Pin = keyboard_C1_Pin|keyboard_C2_Pin|keyboard_C3_Pin|keyboard_C4_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : keyboard_R4_Pin__ */
+  GPIO_InitStruct.Pin = keyboard_R4_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(keyboard_R4_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : VOICE_Digital_in_Pin */
   GPIO_InitStruct.Pin = VOICE_Digital_in_Pin;
