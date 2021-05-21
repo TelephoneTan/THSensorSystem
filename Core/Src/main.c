@@ -653,6 +653,8 @@ int main(void)
     DHT_digitalWrite(getPin(GPIOB, GPIO_PIN_12), DHT_PIN_VALUE_LOW);
     HAL_Delay(1100); // wait for DHT to be stable
     dht_init(getPin(GPIOA, GPIO_PIN_1));
+    lcd_init();
+    lcd_clear();
 #endif
 /** ################################## wxm ################################## */
 #ifdef WXM
