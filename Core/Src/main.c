@@ -129,6 +129,26 @@ UART_HandleTypeDef huart3;
 /* USER CODE BEGIN PV */
 /** ################################## tlf ################################## */
 #ifdef TLF
+const uint16_t RS_Pin = PA2;
+const uint16_t RW_Pin = PA3;
+const uint16_t EN_Pin = PA4;
+const uint16_t D0_Pin = PA5;
+const uint16_t D1_Pin = PA6;
+const uint16_t D2_Pin = PA7;
+const uint16_t D3_Pin = PC4;
+const uint16_t D4_Pin = PC5;
+const uint16_t D5_Pin = PB0;
+const uint16_t D6_Pin = PB1;
+const uint16_t D7_Pin = PC2;
+
+const uint16_t keyboard_C4_Pin__ = PD2;
+const uint16_t keyboard_C3_Pin__ = PC12;
+const uint16_t keyboard_C2_Pin__ = PC11;
+const uint16_t keyboard_C1_Pin__ = PC10;
+const uint16_t keyboard_R1_Pin__ = PC6;
+const uint16_t keyboard_R2_Pin__ = PC7;
+const uint16_t keyboard_R3_Pin__ = PC8;
+const uint16_t keyboard_R4_Pin__ = PC9;
 #endif
 /** ################################## wxm ################################## */
 #ifdef WXM
@@ -138,14 +158,6 @@ UART_HandleTypeDef huart3;
 #endif
 /** ################################## sjj ################################## */
 #ifdef SJJ
-const uint16_t keyboard_C4_Pin__ = PD2;
-const uint16_t keyboard_C3_Pin__ = PC12;
-const uint16_t keyboard_C2_Pin__ = PC11;
-const uint16_t keyboard_C1_Pin__ = PC10;
-const uint16_t keyboard_R1_Pin__ = PC6;
-const uint16_t keyboard_R2_Pin__ = PC7;
-const uint16_t keyboard_R3_Pin__ = PC8;
-const uint16_t keyboard_R4_Pin__ = PC9;
 #endif
 /** ################################## tyj ################################## */
 #ifdef TYJ
@@ -459,15 +471,37 @@ void printTHtoLCD(float t, float h){
     lcd_print(0, 0, "tem: %.2f", t);
     lcd_print(1, 0, "hum: %.0f%%", h);
 }
-#endif
-/** ################################## wxm ################################## */
-#ifdef WXM
-#endif
-/** ################################## ppy ################################## */
-#ifdef PPY
-#endif
-/** ################################## sjj ################################## */
-#ifdef SJJ
+void LCD_pinMode(uint16_t pin, LCD_PIN_MODE mode){
+    switch (mode) {
+        case LCD_PIN_MODE_INPUT_PULLUP:
+            DHT_pinMode(pin, DHT_PIN_MODE_INPUT_PULLUP); break;
+        case LCD_PIN_MODE_INPUT:
+            DHT_pinMode(pin, DHT_PIN_MODE_INPUT); break;
+        case LCD_PIN_MODE_OUTPUT:
+            DHT_pinMode(pin, DHT_PIN_MODE_OUTPUT); break;
+        default:;
+    }
+}
+void LCD_digitalWrite(uint16_t pin, LCD_PIN_VALUE value){
+    switch (value) {
+        case LCD_PIN_VALUE_HIGH:
+            DHT_digitalWrite(pin, DHT_PIN_VALUE_HIGH);
+            break;
+        case LCD_PIN_VALUE_LOW:
+            DHT_digitalWrite(pin, DHT_PIN_VALUE_LOW);
+            break;
+        default:;
+    }
+}
+LCD_PIN_VALUE LCD_digitalRead(uint16_t pin){
+    switch (DHT_digitalRead(pin)) {
+        default:
+        case DHT_PIN_VALUE_HIGH:
+            return LCD_PIN_VALUE_HIGH;
+        case DHT_PIN_VALUE_LOW:
+            return LCD_PIN_VALUE_LOW;
+    }
+}
 void KEY_BOARD_digitalWrite(uint16_t pin, KEY_BOARD_PIN_VALUE value){
     switch (value) {
         case KEY_BOARD_PIN_VALUE_HIGH:
@@ -488,6 +522,15 @@ KEY_BOARD_PIN_VALUE KEY_BOARD_digitalRead(uint16_t pin){
             return KEY_BOARD_PIN_VALUE_LOW;
     }
 }
+#endif
+/** ################################## wxm ################################## */
+#ifdef WXM
+#endif
+/** ################################## ppy ################################## */
+#ifdef PPY
+#endif
+/** ################################## sjj ################################## */
+#ifdef SJJ
 #endif
 /** ################################## tyj ################################## */
 #ifdef TYJ

@@ -7,36 +7,6 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#include "stm32f1xx_hal.h"
-
-/*********** Define the LCD PINS below ****************/
-
-#define RS_Pin GPIO_PIN_2  // register change
-#define RS_GPIO_Port GPIOA //port A
-#define RW_Pin GPIO_PIN_3  //R/W
-#define RW_GPIO_Port GPIOA
-#define EN_Pin GPIO_PIN_4	//ENABLE
-#define EN_GPIO_Port GPIOA
-#define D0_Pin GPIO_PIN_5   //DATA 0~7
-#define D0_GPIO_Port GPIOA
-#define D1_Pin GPIO_PIN_6
-#define D1_GPIO_Port GPIOA
-#define D2_Pin GPIO_PIN_7
-#define D2_GPIO_Port GPIOA
-#define D3_Pin GPIO_PIN_4
-#define D3_GPIO_Port GPIOC
-#define D4_Pin GPIO_PIN_5
-#define D4_GPIO_Port GPIOC
-#define D5_Pin GPIO_PIN_0
-#define D5_GPIO_Port GPIOB
-#define D6_Pin GPIO_PIN_1
-#define D6_GPIO_Port GPIOB
-#define D7_Pin GPIO_PIN_2
-#define D7_GPIO_Port GPIOC
-
-
-GPIO_InitTypeDef GPIO_InitStruct = {0};
-
 /*
  * Waiting for the cpu free
  * There are two ways to make it acheive
@@ -46,26 +16,17 @@ GPIO_InitTypeDef GPIO_InitStruct = {0};
  * 	I used the first way
  */
 void busy_wait(){
+    LCD_digitalWrite(RS_Pin, LCD_PIN_VALUE_LOW);
+    LCD_digitalWrite(RW_Pin, LCD_PIN_VALUE_HIGH);
+    LCD_digitalWrite(EN_Pin, LCD_PIN_VALUE_HIGH);
 
-    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_SET);
-    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
+    LCD_pinMode(D7_Pin, LCD_PIN_MODE_INPUT);
 
-	 __HAL_RCC_GPIOB_CLK_ENABLE();
-	GPIO_InitStruct.Pin = GPIO_PIN_2;
-	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+    while(LCD_digitalRead(D7_Pin)==LCD_PIN_VALUE_HIGH){
 
-	while(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_2)==GPIO_PIN_SET){
+    }
 
-	}
-
-	GPIO_InitStruct.Pin = GPIO_PIN_2;
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-	HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+    LCD_pinMode(D7_Pin, LCD_PIN_MODE_OUTPUT);
 }
 /*
  * Read the data from D0~D7
@@ -74,23 +35,23 @@ void busy_wait(){
 void send_to_lcd (char data, int rs)
 {
 
-    HAL_GPIO_WritePin(RW_GPIO_Port, RW_Pin, 0); //no read only write whether date or command
-    HAL_GPIO_WritePin(RS_GPIO_Port, RS_Pin, rs);  // rs = 1 for data, rs=0 for command
+    LCD_digitalWrite(RW_Pin, LCD_PIN_VALUE_LOW); //no read only write whether date or command
+    LCD_digitalWrite(RS_Pin, rs ? LCD_PIN_VALUE_HIGH : LCD_PIN_VALUE_LOW);  // rs = 1 for data, rs=0 for command
 
-    HAL_GPIO_WritePin(EN_GPIO_Port, EN_Pin, 1);
+    LCD_digitalWrite(EN_Pin, LCD_PIN_VALUE_HIGH);
 
     /* write the data to the respective pin */
-    HAL_GPIO_WritePin(D7_GPIO_Port, D7_Pin, ((data>>7)&0x01));
-    HAL_GPIO_WritePin(D6_GPIO_Port, D6_Pin, ((data>>6)&0x01));
-    HAL_GPIO_WritePin(D5_GPIO_Port, D5_Pin, ((data>>5)&0x01));
-    HAL_GPIO_WritePin(D4_GPIO_Port, D4_Pin, ((data>>4)&0x01));
-    HAL_GPIO_WritePin(D3_GPIO_Port, D3_Pin, ((data>>3)&0x01));
-    HAL_GPIO_WritePin(D2_GPIO_Port, D2_Pin, ((data>>2)&0x01));
-    HAL_GPIO_WritePin(D1_GPIO_Port, D1_Pin, ((data>>1)&0x01));
-    HAL_GPIO_WritePin(D0_GPIO_Port, D0_Pin, ((data>>0)&0x01));
+    LCD_digitalWrite(D7_Pin, ((data>>7)&0x01));
+    LCD_digitalWrite(D6_Pin, ((data>>6)&0x01));
+    LCD_digitalWrite(D5_Pin, ((data>>5)&0x01));
+    LCD_digitalWrite(D4_Pin, ((data>>4)&0x01));
+    LCD_digitalWrite(D3_Pin, ((data>>3)&0x01));
+    LCD_digitalWrite(D2_Pin, ((data>>2)&0x01));
+    LCD_digitalWrite(D1_Pin, ((data>>1)&0x01));
+    LCD_digitalWrite(D0_Pin, ((data>>0)&0x01));
 
 
-    HAL_GPIO_WritePin(EN_GPIO_Port, EN_Pin, 0);
+    LCD_digitalWrite(EN_Pin, LCD_PIN_VALUE_LOW);
 }
 /*
  * write cmd
