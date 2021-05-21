@@ -43,20 +43,26 @@ GPIO_InitTypeDef GPIO_InitStruct = {0};
  * 	I used the first way
  */
 void busy_wait(){
-//	 __HAL_RCC_GPIOB_CLK_ENABLE();
-//	GPIO_InitStruct.Pin = GPIO_PIN_1;
-//	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-//	GPIO_InitStruct.Pull = GPIO_NOPULL;
-//	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-//
-//	while(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1)==GPIO_PIN_SET);//WAIT FOR CPU FREE
-//
-//	GPIO_InitStruct.Pin = GPIO_PIN_1;
-//	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-//	GPIO_InitStruct.Pull = GPIO_NOPULL;
-//	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-//	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-    HAL_Delay(40);
+
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
+
+	 __HAL_RCC_GPIOB_CLK_ENABLE();
+	GPIO_InitStruct.Pin = GPIO_PIN_2;
+	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+	while(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_2)==GPIO_PIN_SET){
+
+	}
+
+	GPIO_InitStruct.Pin = GPIO_PIN_2;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 }
 /*
  * Read the data from D0~D7
@@ -69,7 +75,6 @@ void send_to_lcd (char data, int rs)
     HAL_GPIO_WritePin(RS_GPIO_Port, RS_Pin, rs);  // rs = 1 for data, rs=0 for command
 
     HAL_GPIO_WritePin(EN_GPIO_Port, EN_Pin, 1);
-    HAL_Delay(80);
 
     /* write the data to the respective pin */
     HAL_GPIO_WritePin(D7_GPIO_Port, D7_Pin, ((data>>7)&0x01));
@@ -83,7 +88,6 @@ void send_to_lcd (char data, int rs)
 
 
     HAL_GPIO_WritePin(EN_GPIO_Port, EN_Pin, 0);
-    HAL_Delay(80);
 }
 /*
  * write cmd
