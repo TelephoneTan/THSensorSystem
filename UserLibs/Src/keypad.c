@@ -1,7 +1,6 @@
 #include "keypad.h"
 
-uint16_t read_keypad (void)
-{
+static uint16_t read_keypad_in(int endless_loop, long long repeat_time){
     uint16_t btn_C[4] = {
             keyboard_C1_Pin__,
             keyboard_C2_Pin__,
@@ -14,7 +13,7 @@ uint16_t read_keypad (void)
             keyboard_R3_Pin__,
             keyboard_R4_Pin__
     };
-    while (1) {
+    for(int r = 0; endless_loop || r < repeat_time; r++) {
         for (int i = 0; i < sizeof(btn_C) / sizeof(uint16_t); ++i) {
             for (int set_index = 0; set_index < sizeof(btn_C) / sizeof(uint16_t); ++set_index) {
                 KEY_BOARD_digitalWrite(btn_C[set_index],
@@ -28,4 +27,14 @@ uint16_t read_keypad (void)
             }
         }
     }
+    return UINT16_MAX;
+}
+
+uint16_t read_keypad (void)
+{
+    return read_keypad_in(1, 0);
+}
+
+uint16_t test_read_keypad(){
+    return read_keypad_in(0, 1LL);
 }

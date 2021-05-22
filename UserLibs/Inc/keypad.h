@@ -10,6 +10,12 @@
  */
 uint16_t read_keypad (void);
 
+/**
+ * Return an integer.
+ * @return 0~15 if any key is pressed, or else UINT16_MAX
+ */
+uint16_t test_read_keypad();
+
 extern const uint16_t keyboard_C1_Pin__;
 extern const uint16_t keyboard_C2_Pin__;
 extern const uint16_t keyboard_C3_Pin__;
