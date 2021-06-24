@@ -543,7 +543,7 @@ typedef uint16_t DigitalPinType;
 #define PO31 (DigitalPinType)510
 #define PP31 (DigitalPinType)511
 
-typedef enum PINS_PinMode {
+typedef enum {
     PINS_PinMode_INPUT_NP,
     PINS_PinMode_INPUT_PU,
     PINS_PinMode_INPUT_PD,
@@ -551,11 +551,11 @@ typedef enum PINS_PinMode {
     PINS_PinMode_OUTPUT_OD
 } PINS_PinMode;
 
-typedef enum PINS_OutputLevel {
+typedef enum {
     PINS_OutputLevel_LOW, PINS_OutputLevel_HIGH, PINS_OutputLevel_NOT_OUTPUT
 } PINS_OutputLevel;
 
-typedef enum PINS_PinValue {
+typedef enum {
     PINS_PinValue_LOW, PINS_PinValue_HIGH
 } PINS_PinValue;
 
