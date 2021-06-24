@@ -13,20 +13,20 @@
 #if defined(PORT_TYPE)
 typedef PORT_TYPE PortType;
 #else
-#error "PORT_TYPE not defined!"
+#error "PORT_TYPE not defined in pins.h !"
 #endif
 #if defined(PIN_TYPE)
 typedef PIN_TYPE PinType;
 #else
-#error "PIN_TYPE not defined!"
+#error "PIN_TYPE not defined in pins.h !"
 #endif
 typedef uint16_t DigitalPinType;
 
 #if !defined(PINS_INVALID_PORT)
-#error "PINS_INVALID_PORT not defined!"
+#error "PINS_INVALID_PORT not defined in pins.h !"
 #endif
 #if !defined(PINS_INVALID_PIN)
-#error "PINS_INVALID_PIN not defined!"
+#error "PINS_INVALID_PIN not defined in pins.h !"
 #endif
 #define PINS_INVALID_DIGITAL_PIN UINT16_MAX
 
