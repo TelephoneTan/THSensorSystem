@@ -30,10 +30,15 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <limits.h>
+#include <stdint.h>
 #include "vlist.h"
 #include "vutils.h"
 #include "logme.h"
 #include "DHT.h"
+#define PORT_TYPE GPIO_TypeDef*
+#define PINS_INVALID_PORT NULL
+#define PIN_TYPE uint16_t
+#define PINS_INVALID_PIN UINT16_MAX
 #include "pins.h"
 #include "LCD1602.h"
 #include "keypad.h"
@@ -216,9 +221,9 @@ long long logme_get_time(){
 int logme_prepare(){
     return 1;
 }
-GPIO_TypeDef *getGPIOx(uint16_t pin){
-    if (pin == PINVALIDE) return GPIOINVALIDE;
-    switch (pin & 15U) {
+PortType pins_get_port(DigitalPinType digitalPin){
+    if (digitalPin == PINS_INVALID_DIGITAL_PIN) return PINS_INVALID_PORT;
+    switch (digitalPin & 15U) {
         case 0U: return GPIOA;
         case 1U: return GPIOB;
         case 2U: return GPIOC;
@@ -226,12 +231,12 @@ GPIO_TypeDef *getGPIOx(uint16_t pin){
         case 4U: return GPIOE;
         case 5U: return GPIOF;
         case 6U: return GPIOG;
-        default: return GPIOINVALIDE;
+        default: return PINS_INVALID_PORT;
     }
 }
-uint16_t getGPIO_Pin(uint16_t pin){
-    if (pin == PINVALIDE) return GPIO_PIN_INVALID_E;
-    switch (pin >> 4U) {
+PinType pins_get_pin(DigitalPinType digitalPin){
+    if (digitalPin == PINS_INVALID_DIGITAL_PIN) return PINS_INVALID_PIN;
+    switch (digitalPin >> 4U) {
         case 0U: return GPIO_PIN_0;
         case 1U: return GPIO_PIN_1;
         case 2U: return GPIO_PIN_2;
@@ -248,12 +253,12 @@ uint16_t getGPIO_Pin(uint16_t pin){
         case 13U: return GPIO_PIN_13;
         case 14U: return GPIO_PIN_14;
         case 15U: return GPIO_PIN_15;
-        default: return GPIO_PIN_INVALID_E;
+        default: return PINS_INVALID_PIN;
     }
 }
-uint16_t getPin(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin){
-    uint16_t res = 0;
-    switch (GPIO_Pin) {
+DigitalPinType pins_get_digital_pin(PortType port, PinType pin){
+    DigitalPinType res = 0;
+    switch (pin) {
         case GPIO_PIN_0: res += 0U<<4U; break;
         case GPIO_PIN_1: res += 1U<<4U; break;
         case GPIO_PIN_2: res += 2U<<4U; break;
@@ -270,24 +275,24 @@ uint16_t getPin(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin){
         case GPIO_PIN_13: res += 13U<<4U; break;
         case GPIO_PIN_14: res += 14U<<4U; break;
         case GPIO_PIN_15: res += 15U<<4U; break;
-        default: return PINVALIDE;
+        default: return PINS_INVALID_DIGITAL_PIN;
     }
-    if (GPIOx == GPIOA){
+    if (port == GPIOA){
         res += 0U;
-    } else if (GPIOx == GPIOB){
+    } else if (port == GPIOB){
         res += 1U;
-    } else if (GPIOx == GPIOC){
+    } else if (port == GPIOC){
         res += 2U;
-    } else if (GPIOx == GPIOD){
+    } else if (port == GPIOD){
         res += 3U;
-    } else if (GPIOx == GPIOE){
+    } else if (port == GPIOE){
         res += 4U;
-    } else if (GPIOx == GPIOF){
+    } else if (port == GPIOF){
         res += 5U;
-    } else if (GPIOx == GPIOG){
+    } else if (port == GPIOG){
         res += 6U;
     } else{
-        return PINVALIDE;
+        return PINS_INVALID_DIGITAL_PIN;
     }
     return res;
 }
@@ -362,7 +367,7 @@ void GPIO_Configure(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin, GPIO_OutputLevel out
 void DHT_pinMode_in(uint16_t pin, DHT_PIN_MODE mode, int default_output_low){
     switch (mode) {
         case DHT_PIN_MODE_INPUT:
-            GPIO_Configure(getGPIOx(pin), getGPIO_Pin(pin), GPIO_OutputLevel_NOT_OUTPUT, GPIO_MODE_INPUT, GPIO_NOPULL,
+            GPIO_Configure(pins_get_port(pin), pins_get_pin(pin), GPIO_OutputLevel_NOT_OUTPUT, GPIO_MODE_INPUT, GPIO_NOPULL,
 #ifdef GPIO_SPEED_VERY_HIGH
                     GPIO_SPEED_VERY_HIGH
 #else
@@ -371,7 +376,7 @@ void DHT_pinMode_in(uint16_t pin, DHT_PIN_MODE mode, int default_output_low){
             );
             break;
         case DHT_PIN_MODE_INPUT_PULLUP:
-            GPIO_Configure(getGPIOx(pin), getGPIO_Pin(pin), GPIO_OutputLevel_NOT_OUTPUT, GPIO_MODE_INPUT, GPIO_PULLUP,
+            GPIO_Configure(pins_get_port(pin), pins_get_pin(pin), GPIO_OutputLevel_NOT_OUTPUT, GPIO_MODE_INPUT, GPIO_PULLUP,
 #ifdef GPIO_SPEED_VERY_HIGH
                     GPIO_SPEED_VERY_HIGH
 #else
@@ -380,7 +385,7 @@ void DHT_pinMode_in(uint16_t pin, DHT_PIN_MODE mode, int default_output_low){
             );
             break;
         case DHT_PIN_MODE_OUTPUT:
-            GPIO_Configure(getGPIOx(pin), getGPIO_Pin(pin), default_output_low ? GPIO_OutputLevel_LOW : GPIO_OutputLevel_HIGH, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL,
+            GPIO_Configure(pins_get_port(pin), pins_get_pin(pin), default_output_low ? GPIO_OutputLevel_LOW : GPIO_OutputLevel_HIGH, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL,
 #ifdef GPIO_SPEED_VERY_HIGH
                     GPIO_SPEED_VERY_HIGH
 #else
@@ -440,17 +445,17 @@ void DHT_delayMicroseconds(unsigned long us) {
 void DHT_digitalWrite(uint16_t pin, DHT_PIN_VALUE value){
     switch (value) {
         case DHT_PIN_VALUE_LOW:
-            HAL_GPIO_WritePin(getGPIOx(pin), getGPIO_Pin(pin), GPIO_PIN_RESET);
+            HAL_GPIO_WritePin(pins_get_port(pin), pins_get_pin(pin), GPIO_PIN_RESET);
             break;
         case DHT_PIN_VALUE_HIGH:
-            HAL_GPIO_WritePin(getGPIOx(pin), getGPIO_Pin(pin), GPIO_PIN_SET);
+            HAL_GPIO_WritePin(pins_get_port(pin), pins_get_pin(pin), GPIO_PIN_SET);
             break;
         default:
             break;
     }
 }
 DHT_PIN_VALUE DHT_digitalRead(uint16_t pin){
-    switch (HAL_GPIO_ReadPin(getGPIOx(pin), getGPIO_Pin(pin))) {
+    switch (HAL_GPIO_ReadPin(pins_get_port(pin), pins_get_pin(pin))) {
         default:
         case GPIO_PIN_RESET:
             return DHT_PIN_VALUE_LOW;
@@ -691,12 +696,12 @@ int main(void)
 #ifdef TLF
     logme_init();
 //    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, GPIO_PIN_SET);
-    DHT_digitalWrite(getPin(GPIOB, GPIO_PIN_9), DHT_PIN_VALUE_HIGH);
-    DHT_digitalWrite(getPin(GPIOA, GPIO_PIN_12), DHT_PIN_VALUE_HIGH);
-    DHT_digitalWrite(getPin(GPIOA, GPIO_PIN_11), DHT_PIN_VALUE_HIGH);
-    DHT_digitalWrite(getPin(GPIOB, GPIO_PIN_12), DHT_PIN_VALUE_LOW);
+    DHT_digitalWrite(pins_get_digital_pin(GPIOB, GPIO_PIN_9), DHT_PIN_VALUE_HIGH);
+    DHT_digitalWrite(pins_get_digital_pin(GPIOA, GPIO_PIN_12), DHT_PIN_VALUE_HIGH);
+    DHT_digitalWrite(pins_get_digital_pin(GPIOA, GPIO_PIN_11), DHT_PIN_VALUE_HIGH);
+    DHT_digitalWrite(pins_get_digital_pin(GPIOB, GPIO_PIN_12), DHT_PIN_VALUE_LOW);
     HAL_Delay(1100); // wait for DHT to be stable
-    dht_init(getPin(GPIOA, GPIO_PIN_1));
+    dht_init(pins_get_digital_pin(GPIOA, GPIO_PIN_1));
     lcd_init();
     lcd_clear();
 #endif
@@ -729,7 +734,7 @@ int main(void)
 //      LogMe.b("%s", WELCOME);
       LogMe.bt("%s", WELCOME);
       float temperature, humidity;
-      int res = dht_readTemperatureAndHumidity(getPin(GPIOA, GPIO_PIN_1), dht_sensor_type_DHT11, dht_temperature_scale_Celcius, &temperature, &humidity);
+      int res = dht_readTemperatureAndHumidity(pins_get_digital_pin(GPIOA, GPIO_PIN_1), dht_sensor_type_DHT11, dht_temperature_scale_Celcius, &temperature, &humidity);
       if (res){
           LogMe.bt("Temperature = %f (C), Humidity = %f", temperature, humidity);
           unsigned char tem_i = temperature;
