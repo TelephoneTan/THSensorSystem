@@ -559,10 +559,14 @@ typedef enum {
     PINS_PinValue_LOW, PINS_PinValue_HIGH
 } PINS_PinValue;
 
+typedef enum {
+    PINS_OutputSpeed_LOW, PINS_OutputSpeed_MEDIUM, PINS_OutputSpeed_HIGH
+} PINS_OutputSpeed;
+
 PortType pins_get_port(DigitalPinType digitalPin);
 PinType pins_get_pin(DigitalPinType digitalPin);
 DigitalPinType pins_get_digital_pin(PortType port, PinType pin);
-void pins_set_pin_mode(DigitalPinType digitalPin, PINS_PinMode mode, PINS_OutputLevel outputLevel);
+void pins_set_pin_mode(DigitalPinType digitalPin, PINS_PinMode mode, PINS_OutputLevel outputLevel, PINS_OutputSpeed outputSpeed);
 void pins_digital_write(DigitalPinType digitalPin, PINS_PinValue value);
 PINS_PinValue pins_digital_read(DigitalPinType digitalPin);
 
